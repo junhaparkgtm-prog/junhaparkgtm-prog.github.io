@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVP Engine · Case Study · Jonathan Park</title>
+<meta name="description" content="CVP Engine is the flagship GTM system I architected. An agentic outbound engine orchestrated in Claude Code that sources decision-makers, renders a personalized video for each one, and runs the follow-up end to end.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1ED;
+    --surface:#FFFFFF;
+    --ink:#18211D;
+    --ink-soft:#566159;
+    --pine:#14483A;
+    --pine-deep:#0C2F26;
+    --pine-glow:#1E6F58;
+    --brass:#BE8B2D;
+    --brass-soft:#D9B05B;
+    --line:#D6DBD3;
+    --line-dark:#27473C;
+
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(12,47,38,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-dark)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .mark{font-family:var(--display);font-weight:700;color:var(--paper);font-size:1rem;letter-spacing:-.01em}
+  .mark span{color:var(--brass-soft)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#A9C2B7;transition:color .2s}
+  .navlinks a:hover{color:var(--brass-soft)}
+  .navlinks a.back{color:#7F9C90}
+  .navlinks a:focus-visible{outline:2px solid var(--brass-soft);outline-offset:4px;border-radius:2px}
+  @media(max-width:640px){.navlinks a:not(.back){display:none}}
+
+  /* HERO */
+  .hero{background:var(--pine-deep);color:var(--paper);padding:70px 0 0;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-dark) 1px,transparent 1px),linear-gradient(90deg,var(--line-dark) 1px,transparent 1px);background-size:46px 46px;opacity:.25;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);pointer-events:none}
+  .hero .wrap{position:relative}
+  .crumb{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#7F9C90;margin-bottom:22px}
+  .crumb a{color:#A9C2B7;transition:color .2s}
+  .crumb a:hover{color:var(--brass-soft)}
+  .hero-eyebrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+  .flag-pill{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine-deep);background:var(--brass-soft);padding:5px 12px;border-radius:20px}
+  .eyebrow{color:#7F9C90}
+  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(2.2rem,5.6vw,3.9rem);line-height:1.05;letter-spacing:-.025em;max-width:18ch}
+  .hero h1 em{font-style:normal;color:var(--brass-soft)}
+  .hero .lede{margin-top:24px;font-size:clamp(1.02rem,1.6vw,1.16rem);color:#C5D6CD;max-width:62ch}
+  .hero .lede b{color:var(--paper);font-weight:600}
+
+  /* role strip */
+  .role-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:1px solid var(--line-dark)}
+  .role-item{padding:20px 24px 4px 0;border-right:1px solid var(--line-dark)}
+  .role-item:last-child{border-right:none;padding-right:0}
+  .role-item .rk{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:8px}
+  .role-item .rv{color:#C5D6CD;font-size:.92rem;line-height:1.5}
+  @media(max-width:700px){.role-strip{grid-template-columns:1fr}.role-item{border-right:none;border-bottom:1px solid var(--line-dark);padding:16px 0}.role-item:last-child{border-bottom:none}}
+
+  /* PIPELINE SIGNATURE */
+  .pipeline{margin-top:52px;padding-bottom:60px;position:relative}
+  .pipe-label{color:#7F9C90;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pipe-label::after{content:"";flex:1;height:1px;background:var(--line-dark)}
+  .pipe-track{display:flex;align-items:stretch;gap:0}
+  .stage{flex:1;min-width:0;background:rgba(255,255,255,.03);border:1px solid var(--line-dark);border-radius:10px;padding:18px 14px 20px;position:relative;transition:border-color .3s,background .3s,transform .3s}
+  .stage:hover{border-color:var(--pine-glow);background:rgba(30,111,88,.10);transform:translateY(-3px)}
+  .stage .num{font-family:var(--mono);font-size:.7rem;color:var(--brass-soft);letter-spacing:.1em}
+  .stage .nm{font-family:var(--display);font-weight:600;font-size:1rem;margin-top:10px;color:var(--paper)}
+  .stage .tool{font-family:var(--mono);font-size:.68rem;color:#8FA99E;margin-top:6px;letter-spacing:.03em;line-height:1.4}
+  .connector{flex:0 0 22px;align-self:center;position:relative;height:2px;background:var(--line-dark);overflow:hidden;border-radius:2px}
+  .connector::after{content:"";position:absolute;top:0;left:-40%;height:100%;width:40%;background:linear-gradient(90deg,transparent,var(--pine-glow),var(--brass-soft),transparent);animation:flow 2.6s linear infinite}
+  .connector:nth-of-type(4)::after{animation-delay:.4s}
+  .connector:nth-of-type(6)::after{animation-delay:.8s}
+  .connector:nth-of-type(8)::after{animation-delay:1.2s}
+  .connector:nth-of-type(10)::after{animation-delay:1.6s}
+  .connector:nth-of-type(12)::after{animation-delay:2s}
+  @keyframes flow{from{left:-40%}to{left:120%}}
+
+  /* STATS BAND */
+  .stats{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stats .wrap{padding-top:50px;padding-bottom:50px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .stat{padding:6px 26px;border-left:1px solid var(--line)}
+  .stat:first-child{padding-left:0;border-left:none}
+  .stat .big{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.03em;color:var(--pine);line-height:1}
+  .stat .big .u{font-size:.42em;color:var(--brass);font-family:var(--mono);letter-spacing:0;vertical-align:baseline}
+  .stat .lab{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px;line-height:1.4}
+  @media(max-width:860px){.stat-grid{grid-template-columns:repeat(2,1fr);gap:30px 0}.stat{border-left:none;padding:0}.stat:nth-child(odd){padding-right:20px}}
+
+  /* SECTION SHELL */
+  section{padding:78px 0}
+  .sec-head{margin-bottom:36px;display:flex;gap:16px;align-items:baseline}
+  .sec-head .snum{font-family:var(--mono);font-size:.74rem;color:var(--brass);letter-spacing:.1em;padding-top:6px}
+  .sec-head .stitle h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.02em;line-height:1.1}
+  .sec-head .stitle .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine);margin-bottom:10px}
+  .sec-intro{color:var(--ink-soft);max-width:64ch;margin:-18px 0 38px 44px;font-size:1.02rem}
+  @media(max-width:600px){.sec-intro{margin-left:0}}
+
+  /* why I built it: lead block */
+  .lead-block{background:var(--paper)}
+  .big-lead{font-family:var(--display);font-weight:500;font-size:clamp(1.22rem,2.3vw,1.6rem);line-height:1.45;letter-spacing:-.01em;color:var(--ink);max-width:62ch}
+  .big-lead em{font-style:normal;color:var(--pine);font-weight:600}
+  .lead-sub{margin-top:22px;color:var(--ink-soft);max-width:64ch;font-size:1.02rem}
+
+  /* value cards A/B/C */
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:30px 26px}
+  .vcard .vnum{font-family:var(--mono);font-size:.72rem;color:var(--brass);letter-spacing:.1em}
+  .vcard h3{font-family:var(--display);font-weight:600;font-size:1.18rem;margin:14px 0 10px;letter-spacing:-.01em}
+  .vcard p{font-size:.95rem;color:var(--ink-soft)}
+  @media(max-width:860px){.value-grid{grid-template-columns:1fr}}
+
+  /* how I built it */
+  .built{background:var(--surface);border-top:1px solid var(--line)}
+  .orch{background:var(--pine-deep);color:var(--paper);border-radius:12px;padding:30px 28px;margin-bottom:20px}
+  .orch .k{font-family:var(--mono);font-size:.72rem;color:var(--brass-soft);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .orch h3{font-family:var(--display);font-weight:600;font-size:1.35rem;margin-bottom:10px;color:var(--paper)}
+  .orch p{color:#C5D6CD;font-size:.98rem;max-width:74ch}
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .svc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 22px}
+  .svc .n{font-family:var(--display);font-weight:600;font-size:1.02rem;color:var(--ink);margin-bottom:8px}
+  .svc .n::before{content:"▸ ";color:var(--brass)}
+  .svc p{color:var(--ink-soft);font-size:.9rem;line-height:1.55}
+  @media(max-width:860px){.svc-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.svc-grid{grid-template-columns:1fr}}
+
+  /* replaces */
+  .replace{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:stretch}
+  .rcol{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
+  .rcol.engine{background:var(--pine-deep);border-color:var(--pine-deep);color:var(--paper)}
+  .rcol .h{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:18px}
+  .rcol.engine .h{color:var(--brass-soft)}
+  .rlist{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .rlist li{font-size:.95rem;line-height:1.5;padding-left:26px;position:relative}
+  .rcol.manual .rlist li{color:var(--ink-soft)}
+  .rcol.manual .rlist li::before{content:"✕";position:absolute;left:0;color:#B0483A;font-family:var(--mono);font-size:.8rem}
+  .rcol.engine .rlist li{color:#DCE7E1}
+  .rcol.engine .rlist li::before{content:"→";position:absolute;left:0;color:var(--brass-soft);font-family:var(--mono)}
+  .arrow{align-self:center;font-family:var(--mono);color:var(--pine-glow);font-size:1.4rem}
+  @media(max-width:860px){.replace{grid-template-columns:1fr}.arrow{transform:rotate(90deg);padding:2px 0}}
+
+  /* proof */
+  .proof{background:var(--surface);border-top:1px solid var(--line)}
+  .proof-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .metric{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--paper);position:relative;overflow:hidden}
+  .metric::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass)}
+  .metric .big{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,4.4vw,2.7rem);letter-spacing:-.03em;color:var(--pine);line-height:1}
+  .metric .big .per{font-family:var(--mono);font-size:.32em;color:var(--brass);letter-spacing:0;vertical-align:middle}
+  .metric .cat{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 8px}
+  .metric .desc{color:var(--ink-soft);font-size:.94rem}
+  .metric .badges{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .badge{font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;color:var(--pine);border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+  @media(max-width:600px){.proof-grid{grid-template-columns:1fr}}
+
+  /* roi */
+  .roi{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start}
+  .roi-table{border-top:1px solid var(--line)}
+  .roi-row{display:flex;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .roi-row .l{color:var(--ink-soft);font-size:.96rem}
+  .roi-row .v{font-family:var(--mono);font-size:.9rem;color:var(--ink);text-align:right;white-space:nowrap}
+  .roi-row.key{background:rgba(20,72,58,.06);margin:0 -14px;padding:15px 14px;border-radius:8px;border-bottom:1px solid transparent}
+  .roi-row.key .v{color:var(--pine);font-weight:500}
+  .roi-copy h3{font-family:var(--display);font-weight:600;font-size:1.4rem;line-height:1.15;margin-bottom:14px;letter-spacing:-.01em;color:var(--pine)}
+  .roi-copy p{color:var(--ink-soft);font-size:1rem;line-height:1.66}
+  @media(max-width:860px){.roi{grid-template-columns:1fr;gap:32px}}
+
+  .note{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);line-height:1.7;margin-top:28px;max-width:78ch;letter-spacing:.02em}
+
+  /* what it proves */
+  .proves{background:var(--paper);border-top:1px solid var(--line)}
+  .proves-inner{border-left:3px solid var(--brass);padding-left:30px;max-width:74ch}
+  .proves .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine);margin-bottom:16px}
+  .proves h3{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.02em;color:var(--ink);margin-bottom:18px;line-height:1.15}
+  .proves p{color:var(--ink-soft);font-size:1.05rem;line-height:1.7}
+  .proves p + p{margin-top:14px}
+  .proves em{font-style:normal;color:var(--pine);font-weight:600}
+
+  /* closing */
+  .closing{background:var(--pine-deep);color:var(--paper);text-align:center;padding:92px 0}
+  .closing .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:20px}
+  .closing h2{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4.4vw,2.8rem);letter-spacing:-.025em;line-height:1.1;max-width:20ch;margin:0 auto 18px}
+  .closing h2 em{font-style:normal;color:var(--brass-soft)}
+  .closing p{color:#C5D6CD;font-size:1.05rem;max-width:52ch;margin:0 auto 34px}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 26px;border-radius:8px;transition:transform .2s,background .2s,color .2s,border-color .2s}
+  .btn-primary{background:var(--brass-soft);color:var(--pine-deep);font-weight:500}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--brass)}
+  .btn-ghost{border:1px solid var(--line-dark);color:var(--paper)}
+  .btn-ghost:hover{border-color:var(--brass-soft);color:var(--brass-soft)}
+
+  footer{background:var(--paper);padding:30px 0;border-top:1px solid var(--line)}
+  .foot-in{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;color:var(--ink-soft)}
+  .foot-in a{color:var(--pine)}
+  .foot-in a:hover{color:var(--brass)}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="https://junhaparkgtm-prog.github.io/" class="mark">Jonathan Park<span>.</span></a>
+    <div class="navlinks">
+      <a href="#what">Overview</a>
+      <a href="#built">How I built it</a>
+      <a href="#proof">Results</a>
+      <a href="https://junhaparkgtm-prog.github.io/#work" class="back">← All work</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="crumb"><a href="https://junhaparkgtm-prog.github.io/">Jonathan Park</a> &nbsp;/&nbsp; <a href="https://junhaparkgtm-prog.github.io/#work">Work</a> &nbsp;/&nbsp; CVP Engine</div>
+    <div class="hero-eyebrow">
+      <span class="flag-pill">Flagship project</span>
+      <span class="eyebrow mono">GTM engineering · 2026</span>
+    </div>
+    <h1>I built an outbound machine that <em>personalizes at scale.</em></h1>
+    <p class="lede">Automation of a video-led outbound motion with a four-year revenue track record (~$100M in client enrollment revenue when run manually). A seven-stage Claude Code agent now takes a <b>raw list to booked calls with no human in the loop</b>: 25–50 personalized videos per run on ~30 minutes of operator time.</p>
+
+    <div class="role-strip">
+      <div class="role-item"><div class="rk">My role</div><div class="rv">Architected, built, and operated end to end.</div></div>
+      <div class="role-item"><div class="rk">Orchestration</div><div class="rv">Claude Code agent wiring 7 services.</div></div>
+      <div class="role-item"><div class="rk">Context</div><div class="rv">GTM systems work at Atomic Enrollment.</div></div>
+    </div>
+
+    <div class="pipeline" id="pipeline">
+      <div class="pipe-label mono">The pipeline · raw list in, booked calls out</div>
+      <div class="pipe-track">
+        <div class="stage"><div class="num">01</div><div class="nm">Source</div><div class="tool">Prospeo</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">02</div><div class="nm">Qualify</div><div class="tool">Firecrawl · ICP</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">03</div><div class="nm">Enrich</div><div class="tool">site · ads</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">04</div><div class="nm">Render</div><div class="tool">Modal</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">05</div><div class="nm">Host</div><div class="tool">Bunny CDN</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">06</div><div class="nm">Send</div><div class="tool">Instantly</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">07</div><div class="nm">Learn</div><div class="tool">replies → next run</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat-grid reveal">
+      <div class="stat"><div class="big">25–50<span class="u">/day</span></div><div class="lab">Videos per run</div></div>
+      <div class="stat"><div class="big">~30<span class="u">min</span></div><div class="lab">My time / batch</div></div>
+      <div class="stat"><div class="big">1</div><div class="lab">Person running it</div></div>
+      <div class="stat"><div class="big">7</div><div class="lab">Tools, one workflow</div></div>
+    </div>
+  </div>
+</div>
+
+<section class="lead-block" id="why">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">00</span><div class="stitle"><div class="kicker">Why I built it</div><h2>The wall every outbound team hits.</h2></div></div>
+    <p class="big-lead reveal">Real personalization takes a rep about an hour per prospect, so it never scales, and everyone falls back on <em>{first_name}</em> templates. I didn't buy that this was a law of nature. I thought it was a tooling problem.</p>
+    <p class="lead-sub reveal">So I built the proof: one person orchestrating the right AI services can out-personalize a whole outbound team and never drop the follow-up. That system is CVP Engine, and everything below is how it works and what it's done.</p>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">01</span><div class="stitle"><div class="kicker">What it does</div><h2>A full outbound motion, collapsed into one workflow.</h2></div></div>
+    <p class="sec-intro reveal">Not a tool. It's the whole motion: sourcing, research, personalization, and follow-up, running as one repeatable command.</p>
+    <div class="value-grid">
+      <div class="vcard reveal"><div class="vnum">A</div><h3>Personalized at scale</h3><p>Each prospect gets a video composited around their own business, not a merge tag. The kind of personalization that used to take a rep an hour, made in seconds, for everyone.</p></div>
+      <div class="vcard reveal"><div class="vnum">B</div><h3>Run by one operator</h3><p>I pick the niche, approve the copy, review a few samples, and push. The machine handles sourcing, rendering, hosting, and sending end to end.</p></div>
+      <div class="vcard reveal"><div class="vnum">C</div><h3>Smarter every round</h3><p>Replies feed back in. What lands gets reused, what flops gets cut. The next batch starts from what already worked.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="built" id="built">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">02</span><div class="stitle"><div class="kicker">How I built it</div><h2>Seven services, one command.</h2></div></div>
+    <p class="sec-intro reveal">I architected it in Claude Code, wiring seven specialized services into a single run where each stage hands clean data to the next.</p>
+    <div class="orch reveal">
+      <div class="k">Claude Code · orchestration</div>
+      <h3>The brain</h3>
+      <p>Runs the workflow end to end: decides what to source, fit-checks each lead, writes the copy, fires the render jobs, and pushes the finished batch, with human checkpoints I kept at copy approval and sample review.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc reveal"><div class="n">Prospeo</div><p>Sources decision-makers in the target niche with verified contact data.</p></div>
+      <div class="svc reveal"><div class="n">Firecrawl</div><p>Scrapes each prospect's site + ads to fit-check against ICP and pull visuals.</p></div>
+      <div class="svc reveal"><div class="n">Supabase</div><p>System of record: leads, status, render links, send state. Reply and engagement data writes back here and feeds the next run, so targeting tightens batch over batch.</p></div>
+      <div class="svc reveal"><div class="n">Modal</div><p>Renders a personalized video per prospect in parallel, on demand.</p></div>
+      <div class="svc reveal"><div class="n">Bunny CDN</div><p>Hosts every video on its own fast, trackable link.</p></div>
+      <div class="svc reveal"><div class="n">Instantly</div><p>Sends from a warmed inbox pool and routes every reply to one place.</p></div>
+      <div class="svc reveal"><div class="n">ICP gate</div><p>A qualification pass I built to block anyone off-target before a dollar of compute is spent.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="replaces">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">03</span><div class="stitle"><div class="kicker">What it replaces</div><h2>The work a whole team used to do by hand.</h2></div></div>
+    <div class="replace">
+      <div class="rcol manual reveal">
+        <div class="h">The manual way</div>
+        <ul class="rlist">
+          <li>A rep researches each account one at a time</li>
+          <li>Generic templates with a {first_name} swap</li>
+          <li>Personalization capped by hours in the day</li>
+          <li>Follow-up drops the moment things get busy</li>
+          <li>Headcount is the only way to scale volume</li>
+        </ul>
+      </div>
+      <div class="arrow reveal">→</div>
+      <div class="rcol engine reveal">
+        <div class="h">CVP Engine</div>
+        <ul class="rlist">
+          <li>The whole niche researched in one run</li>
+          <li>A real video per prospect, built on their site</li>
+          <li>Personalization scales with compute, not hours</li>
+          <li>The sequence follows up on its own, every time</li>
+          <li>More volume is a config change, not a hire</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" id="proof">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">04</span><div class="stitle"><div class="kicker">Results</div><h2>The motion behind it drives real revenue.</h2></div></div>
+    <p class="sec-intro reveal">The video-led outbound motion this engine automates has driven enrollment revenue across very different markets.</p>
+    <div class="proof-grid">
+      <div class="metric reveal">
+        <div class="big">$1.87M<span class="per">/rev</span></div>
+        <div class="cat">Heavy equipment training</div>
+        <div class="desc">97 enrollments off video-led outbound.</div>
+        <div class="badges"><span class="badge">12.6× ROAS</span><span class="badge">97 enrollments</span></div>
+      </div>
+      <div class="metric reveal">
+        <div class="big">$300K<span class="per">/90d</span></div>
+        <div class="cat">Construction &amp; trades</div>
+        <div class="desc">Three months, one targeted motion.</div>
+        <div class="badges"><span class="badge">11.5× ROAS</span><span class="badge">90 days</span></div>
+      </div>
+      <div class="metric reveal">
+        <div class="big">$98K<span class="per">/mo</span></div>
+        <div class="cat">Tower technician program</div>
+        <div class="desc">A single month, GI Bill angle.</div>
+        <div class="badges"><span class="badge">1 month</span><span class="badge">military niche</span></div>
+      </div>
+      <div class="metric reveal">
+        <div class="big">~$100M<span class="per">total</span></div>
+        <div class="cat">Across the client base</div>
+        <div class="desc">Enrollment revenue driven over four years.</div>
+        <div class="badges"><span class="badge">4 years</span><span class="badge">multi-niche</span></div>
+      </div>
+    </div>
+    <p class="note reveal">// These are client results from the video-led outbound motion CVP Engine automates and scales. They're the proof the underlying play converts. Figures reflect that motion, not a guarantee of results; output depends on offer strength, list quality, and deliverability.</p>
+  </div>
+</section>
+
+<section id="math">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="snum">05</span><div class="stitle"><div class="kicker">The ROI math</div><h2>Where the leverage comes from.</h2></div></div>
+    <p class="sec-intro reveal">The cost of producing personalized outreach drops toward zero while the personalization goes up.</p>
+    <div class="roi">
+      <div class="roi-table reveal">
+        <div class="roi-row"><span class="l">Outbound rep (fully loaded)</span><span class="v">~$60–80K / yr</span></div>
+        <div class="roi-row"><span class="l">Truly personalized touches / day, by hand</span><span class="v">a handful</span></div>
+        <div class="roi-row"><span class="l">Engine, personalized videos / day</span><span class="v">25–50</span></div>
+        <div class="roi-row"><span class="l">My time per batch</span><span class="v">~30 min</span></div>
+        <div class="roi-row key"><span class="l">Marginal cost per extra prospect</span><span class="v">≈ compute only</span></div>
+      </div>
+      <div class="roi-copy reveal">
+        <h3>Volume stops being a headcount problem.</h3>
+        <p>A team scales personalization by hiring. I scaled it by changing a number. One operator covers the ground an outbound team used to, at a fraction of the cost, with personalization a human can't match at speed.</p>
+      </div>
+    </div>
+    <p class="note reveal">// Figures are illustrative of the cost structure, not a guarantee of results. Throughput shown is capacity per run.</p>
+  </div>
+</section>
+
+<section class="proves" id="proves">
+  <div class="wrap">
+    <div class="proves-inner reveal">
+      <div class="kicker">What it says about how I work</div>
+      <h3>I don't just run the play. I build the machine that runs it.</h3>
+      <p>I carried a $1.1M quota before I automated anything, so I know exactly where outbound breaks. I was the one it broke on. CVP Engine is what I do with that: instead of asking for more headcount, I wired sourcing, enrichment, rendering, and sending into <em>one agentic system</em> and let it carry the volume.</p>
+      <p>That's the instinct I bring to a revenue team: treat the whole funnel as something to engineer, not just staff. This project is the clearest proof of it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <div class="kicker">Let's talk</div>
+    <h2>Want the full walkthrough?</h2>
+    <p>Happy to screen-share the whole pipeline running live, sourcing to send, and talk through the architecture decisions.</p>
+    <div class="cta-row">
+      <a href="mailto:junhaparkgtm@gmail.com" class="btn btn-primary">junhaparkgtm@gmail.com</a>
+      <a href="https://junhaparkgtm-prog.github.io/" class="btn btn-ghost">← Back to portfolio</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>Jonathan (Junha) Park · GTM Engineer · San Francisco, CA</div>
+    <div><a href="https://junhaparkgtm-prog.github.io/">Portfolio</a> · <a href="mailto:junhaparkgtm@gmail.com">Email</a> · <a href="https://linkedin.com/in/jonathanpark00">LinkedIn</a></div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
