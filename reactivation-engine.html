@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reactivation Engine · Case Study · Jonathan Park</title>
+<meta name="description" content="A pipeline that turns a dead CRM into a ranked call list and stops two disconnected sending tools from hitting the same person twice. Built and operated end to end by Jonathan Park.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1ED;
+    --surface:#FFFFFF;
+    --ink:#18211D;
+    --ink-soft:#566159;
+    --pine:#14483A;
+    --pine-deep:#0C2F26;
+    --pine-glow:#1E6F58;
+    --brass:#BE8B2D;
+    --brass-soft:#D9B05B;
+    --line:#D6DBD3;
+    --line-dark:#27473C;
+
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(12,47,38,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-dark)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .mark{font-family:var(--display);font-weight:700;color:var(--paper);font-size:1rem;letter-spacing:-.01em}
+  .mark span{color:var(--brass-soft)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#A9C2B7;transition:color .2s}
+  .navlinks a:hover{color:var(--brass-soft)}
+  .navlinks a.back{color:#7F9C90}
+  .navlinks a:focus-visible{outline:2px solid var(--brass-soft);outline-offset:4px;border-radius:2px}
+  @media(max-width:640px){.navlinks a:not(.back){display:none}}
+
+  /* HERO */
+  .hero{background:var(--pine-deep);color:var(--paper);padding:70px 0 0;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-dark) 1px,transparent 1px),linear-gradient(90deg,var(--line-dark) 1px,transparent 1px);background-size:46px 46px;opacity:.25;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);pointer-events:none}
+  .hero .wrap{position:relative}
+  .crumb{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#7F9C90;margin-bottom:22px}
+  .crumb a{color:#A9C2B7;transition:color .2s}
+  .crumb a:hover{color:var(--brass-soft)}
+  .hero-eyebrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+  .flag-pill{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine-deep);background:var(--brass-soft);padding:5px 12px;border-radius:20px}
+  .eyebrow{color:#7F9C90}
+  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(2.2rem,5.6vw,3.9rem);line-height:1.05;letter-spacing:-.025em;max-width:18ch}
+  .hero h1 em{font-style:normal;color:var(--brass-soft)}
+  .hero .lede{margin-top:24px;font-size:clamp(1.02rem,1.6vw,1.16rem);color:#C5D6CD;max-width:62ch}
+  .hero .lede b{color:var(--paper);font-weight:600}
+
+  /* role strip */
+  .role-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:1px solid var(--line-dark)}
+  .role-item{padding:20px 24px 4px 0;border-right:1px solid var(--line-dark)}
+  .role-item:last-child{border-right:none;padding-right:0}
+  .role-item .rk{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:8px}
+  .role-item .rv{color:#C5D6CD;font-size:.92rem;line-height:1.5}
+  @media(max-width:700px){.role-strip{grid-template-columns:1fr}.role-item{border-right:none;border-bottom:1px solid var(--line-dark);padding:16px 0}.role-item:last-child{border-bottom:none}}
+
+  /* PIPELINE SIGNATURE */
+  .pipeline{margin-top:52px;padding-bottom:60px;position:relative}
+  .pipe-label{color:#7F9C90;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pipe-label::after{content:"";flex:1;height:1px;background:var(--line-dark)}
+  .pipe-track{display:flex;align-items:stretch;gap:0}
+  .stage{flex:1;min-width:0;background:rgba(255,255,255,.03);border:1px solid var(--line-dark);border-radius:10px;padding:18px 14px 20px;position:relative;transition:border-color .3s,background .3s,transform .3s}
+  .stage:hover{border-color:var(--pine-glow);background:rgba(30,111,88,.10);transform:translateY(-3px)}
+  .stage .num{font-family:var(--mono);font-size:.7rem;color:var(--brass-soft);letter-spacing:.1em}
+  .stage .nm{font-family:var(--display);font-weight:600;font-size:1rem;margin-top:10px;color:var(--paper)}
+  .stage .tool{font-family:var(--mono);font-size:.68rem;color:#8FA99E;margin-top:6px;letter-spacing:.03em;line-height:1.4}
+  .connector{flex:0 0 22px;align-self:center;position:relative;height:2px;background:var(--line-dark);overflow:hidden;border-radius:2px}
+  .connector::after{content:"";position:absolute;top:0;left:-40%;height:100%;width:40%;background:linear-gradient(90deg,transparent,var(--pine-glow),var(--brass-soft),transparent);animation:flow 2.6s linear infinite}
+  .connector:nth-of-type(4)::after{animation-delay:.4s}
+  .connector:nth-of-type(6)::after{animation-delay:.8s}
+  .connector:nth-of-type(8)::after{animation-delay:1.2s}
+  .connector:nth-of-type(10)::after{animation-delay:1.6s}
+  .connector:nth-of-type(12)::after{animation-delay:2s}
+  @keyframes flow{from{left:-40%}to{left:120%}}
+
+  /* STATS BAND */
+  .stats{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stats .wrap{padding-top:50px;padding-bottom:50px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .stat{padding:6px 26px;border-left:1px solid var(--line)}
+  .stat:first-child{padding-left:0;border-left:none}
+  .stat .big{font-family:var(--display);font-weight:700;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.03em;color:var(--pine);line-height:1}
+  .stat .big .u{font-size:.42em;color:var(--brass);font-family:var(--mono);letter-spacing:0;vertical-align:baseline}
+  .stat .lab{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px;line-height:1.4}
+  @media(max-width:860px){.stat-grid{grid-template-columns:repeat(2,1fr);gap:30px 0}.stat{border-left:none;padding:0}.stat:nth-child(odd){padding-right:20px}}
+
+  /* SECTION SHELL */
+  section{padding:78px 0}
+  .sec-head{margin-bottom:36px;display:flex;gap:16px;align-items:baseline}
+  .sec-head .snum{font-family:var(--mono);font-size:.74rem;color:var(--brass);letter-spacing:.1em;padding-top:6px}
+  .sec-head .stitle h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.02em;line-height:1.1}
+  .sec-head .stitle .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine);margin-bottom:10px}
+  .sec-intro{color:var(--ink-soft);max-width:64ch;margin:-18px 0 38px 44px;font-size:1.02rem}
+  @media(max-width:600px){.sec-intro{margin-left:0}}
+
+  /* why I built it: lead block */
+  .lead-block{background:var(--paper)}
+  .big-lead{font-family:var(--display);font-weight:500;font-size:clamp(1.22rem,2.3vw,1.6rem);line-height:1.45;letter-spacing:-.01em;color:var(--ink);max-width:62ch}
+  .big-lead em{font-style:normal;color:var(--pine);font-weight:600}
+  .lead-sub{margin-top:22px;color:var(--ink-soft);max-width:64ch;font-size:1.02rem}
+
+  /* value cards A/B/C */
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:30px 26px}
+  .vcard .vnum{font-family:var(--mono);font-size:.72rem;color:var(--brass);letter-spacing:.1em}
+  .vcard h3{font-family:var(--display);font-weight:600;font-size:1.18rem;margin:14px 0 10px;letter-spacing:-.01em}
+  .vcard p{font-size:.95rem;color:var(--ink-soft)}
+  @media(max-width:860px){.value-grid{grid-template-columns:1fr}}
+
+  /* how I built it */
+  .built{background:var(--surface);border-top:1px solid var(--line)}
+  .orch{background:var(--pine-deep);color:var(--paper);border-radius:12px;padding:30px 28px;margin-bottom:20px}
+  .orch .k{font-family:var(--mono);font-size:.72rem;color:var(--brass-soft);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .orch h3{font-family:var(--display);font-weight:600;font-size:1.35rem;margin-bottom:10px;color:var(--paper)}
+  .orch p{color:#C5D6CD;font-size:.98rem;max-width:74ch}
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .svc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 22px}
+  .svc .n{font-family:var(--display);font-weight:600;font-size:1.02rem;color:var(--ink);margin-bottom:8px}
+  .svc .n::before{content:"▸ ";color:var(--brass)}
+  .svc p{color:var(--ink-soft);font-size:.9rem;line-height:1.55}
+  @media(max-width:860px){.svc-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.svc-grid{grid-template-columns:1fr}}
+
+  /* replaces */
+  .replace{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:stretch}
+  .rcol{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--surface)}
+  .rcol.engine{background:var(--pine-deep);border-color:var(--pine-deep);color:var(--paper)}
+  .rcol .h{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:18px}
+  .rcol.engine .h{color:var(--brass-soft)}
+  .rlist{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .rlist li{font-size:.95rem;line-height:1.5;padding-left:26px;position:relative}
+  .rcol.manual .rlist li{color:var(--ink-soft)}
+  .rcol.manual .rlist li::before{content:"✕";position:absolute;left:0;color:#B0483A;font-family:var(--mono);font-size:.8rem}
+  .rcol.engine .rlist li{color:#DCE7E1}
+  .rcol.engine .rlist li::before{content:"→";position:absolute;left:0;color:var(--brass-soft);font-family:var(--mono)}
+  .arrow{align-self:center;font-family:var(--mono);color:var(--pine-glow);font-size:1.4rem}
+  @media(max-width:860px){.replace{grid-template-columns:1fr}.arrow{transform:rotate(90deg);padding:2px 0}}
+
+  /* proof */
+  .proof{background:var(--surface);border-top:1px solid var(--line)}
+  .proof-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .metric{border:1px solid var(--line);border-radius:12px;padding:28px 26px;background:var(--paper);position:relative;overflow:hidden}
+  .metric::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass)}
+  .metric .big{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,4.4vw,2.7rem);letter-spacing:-.03em;color:var(--pine);line-height:1}
+  .metric .big .per{font-family:var(--mono);font-size:.32em;color:var(--brass);letter-spacing:0;vertical-align:middle}
+  .metric .cat{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 8px}
+  .metric .desc{color:var(--ink-soft);font-size:.94rem}
+  .metric .badges{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .badge{font-family:var(--mono);font-size:.68rem;letter-spacing:.04em;color:var(--pine);border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+  @media(max-width:600px){.proof-grid{grid-template-columns:1fr}}
+
+  /* roi */
+  .roi{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start}
+  .roi-table{border-top:1px solid var(--line)}
+  .roi-row{display:flex;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .roi-row .l{color:var(--ink-soft);font-size:.96rem}
+  .roi-row .v{font-family:var(--mono);font-size:.9rem;color:var(--ink);text-align:right;white-space:nowrap}
+  .roi-row.key{background:rgba(20,72,58,.06);margin:0 -14px;padding:15px 14px;border-radius:8px;border-bottom:1px solid transparent}
+  .roi-row.key .v{color:var(--pine);font-weight:500}
+  .roi-copy h3{font-family:var(--display);font-weight:600;font-size:1.4rem;line-height:1.15;margin-bottom:14px;letter-spacing:-.01em;color:var(--pine)}
+  .roi-copy p{color:var(--ink-soft);font-size:1rem;line-height:1.66}
+  @media(max-width:860px){.roi{grid-template-columns:1fr;gap:32px}}
+
+  .note{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);line-height:1.7;margin-top:28px;max-width:78ch;letter-spacing:.02em}
+
+  /* what it proves */
+  .proves{background:var(--paper);border-top:1px solid var(--line)}
+  .proves-inner{border-left:3px solid var(--brass);padding-left:30px;max-width:74ch}
+  .proves .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine);margin-bottom:16px}
+  .proves h3{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,2.8vw,2rem);letter-spacing:-.02em;color:var(--ink);margin-bottom:18px;line-height:1.15}
+  .proves p{color:var(--ink-soft);font-size:1.05rem;line-height:1.7}
+  .proves p + p{margin-top:14px}
+  .proves em{font-style:normal;color:var(--pine);font-weight:600}
+
+  /* closing */
+  .closing{background:var(--pine-deep);color:var(--paper);text-align:center;padding:92px 0}
+  .closing .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:20px}
+  .closing h2{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4.4vw,2.8rem);letter-spacing:-.025em;line-height:1.1;max-width:20ch;margin:0 auto 18px}
+  .closing h2 em{font-style:normal;color:var(--brass-soft)}
+  .closing p{color:#C5D6CD;font-size:1.05rem;max-width:52ch;margin:0 auto 34px}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 26px;border-radius:8px;transition:transform .2s,background .2s,color .2s,border-color .2s}
+  .btn-primary{background:var(--brass-soft);color:var(--pine-deep);font-weight:500}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--brass)}
+  .btn-ghost{border:1px solid var(--line-dark);color:var(--paper)}
+  .btn-ghost:hover{border-color:var(--brass-soft);color:var(--brass-soft)}
+
+  footer{background:var(--paper);padding:30px 0;border-top:1px solid var(--line)}
+  .foot-in{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;color:var(--ink-soft)}
+  .foot-in a{color:var(--pine)}
+  .foot-in a:hover{color:var(--brass)}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="https://junhaparkgtm-prog.github.io/" class="mark">Jonathan Park<span>.</span></a>
+    <div class="navlinks">
+      <a href="#what">Overview</a>
+      <a href="#built">How I built it</a>
+      <a href="#proof">Results</a>
+      <a href="https://junhaparkgtm-prog.github.io/#work" class="back">&larr; All work</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="crumb"><a href="https://junhaparkgtm-prog.github.io/">Jonathan Park</a> &nbsp;/&nbsp; <a href="https://junhaparkgtm-prog.github.io/#work">Work</a> &nbsp;/&nbsp; Reactivation Engine</div>
+    <div class="hero-eyebrow">
+      <span class="flag-pill">Case study</span>
+      <span class="eyebrow mono">Revenue systems &middot; 2026</span>
+    </div>
+    <h1>The pipeline was already paid for. <em>Nobody could see it.</em></h1>
+    <p class="lede">A B2B agency had 5,813 contacts in a CRM and 45 live campaigns in a separate sending tool. The two systems shared nothing. I built the pipeline that <b>scores, segments, and reconciles them</b> &mdash; turning a dead database into a ranked call list without double-contacting a single prospect.</p>
+
+    <div class="role-strip">
+      <div class="role-item"><div class="rk">My role</div><div class="rv">Diagnosed the failures, built the pipeline, shipped the lists.</div></div>
+      <div class="role-item"><div class="rk">Approach</div><div class="rv">Python scoring layer over two disconnected GTM tools.</div></div>
+      <div class="role-item"><div class="rk">Time to first clean send list</div><div class="rv">One working day.</div></div>
+    </div>
+
+    <div class="pipeline" id="pipeline">
+      <div class="pipe-label mono">The pipeline &middot; dead CRM in, ranked call list out</div>
+      <div class="pipe-track">
+        <div class="stage"><div class="num">01</div><div class="nm">Extract</div><div class="tool">both systems</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">02</div><div class="nm">Normalize</div><div class="tool">match &middot; dedupe</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">03</div><div class="nm">Score</div><div class="tool">tags &middot; fit &middot; recency</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">04</div><div class="nm">Segment</div><div class="tool">4 sequences</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">05</div><div class="nm">Reconcile</div><div class="tool">45 live campaigns</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">06</div><div class="nm">Suppress</div><div class="tool">rebuilt DNE list</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat-grid reveal">
+      <div class="stat"><div class="big">5,813</div><div class="lab">Contacts processed</div></div>
+      <div class="stat"><div class="big">1,845</div><div class="lab">Qualified &amp; segmented</div></div>
+      <div class="stat"><div class="big">7</div><div class="lab">Collisions caught before send</div></div>
+      <div class="stat"><div class="big">615&nbsp;&rarr;&nbsp;1,570</div><div class="lab">Do-not-email list rebuilt</div></div>
+    </div>
+  </div>
+</div>
+
+<section class="lead-block" id="what">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="snum">01</div>
+      <div class="stitle">
+        <div class="kicker">The problem</div>
+        <h2>Three failures nobody could see.</h2>
+      </div>
+    </div>
+    <p class="big-lead reveal">Every one of these was invisible in a dashboard. <em>They only show up when you go read the data yourself.</em></p>
+
+    <div class="value-grid reveal" style="margin-top:38px">
+      <div class="vcard">
+        <div class="vnum">01</div>
+        <h3>Wrong call order</h3>
+        <p>The CRM sorts by most recent activity. But recency doesn&rsquo;t predict intent &mdash; tags do. Contacts marked <em>booked</em>, <em>hot lead</em>, or <em>replied</em> convert at a different rate than newsletter subscribers, and sorting by date buries them.</p>
+      </div>
+      <div class="vcard">
+        <div class="vnum">02</div>
+        <h3>Collision risk</h3>
+        <p>Two tools sending to overlapping lists with no shared suppression. A prospect mid-conversation with one rep can receive a cold sequence from another the same week &mdash; and nothing in either system flags it.</p>
+      </div>
+      <div class="vcard">
+        <div class="vnum">03</div>
+        <h3>Silent decay</h3>
+        <p>Contacts who raised a hand and were never followed up on. No system surfaced them, so they aged out quietly. The acquisition cost was already spent; the intent signal just expired.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="built" id="built">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="snum">02</div>
+      <div class="stitle">
+        <div class="kicker">How I built it</div>
+        <h2>A scoring layer over two systems that don&rsquo;t talk.</h2>
+      </div>
+    </div>
+
+    <div class="orch reveal">
+      <div class="k">Orchestration</div>
+      <h3>Python over the CRM and the sender, not inside either one</h3>
+      <p>Neither tool could see the other, and neither exposed the logic I needed. So the pipeline lives outside both: pull full exports, resolve identity across systems, score and segment in pandas, then write clean lists back with tags that survive in the client&rsquo;s CRM rather than in a spreadsheet only I can read.</p>
+    </div>
+
+    <div class="svc-grid reveal">
+      <div class="svc">
+        <div class="n">Extract &amp; normalize</div>
+        <p>Full exports from both systems. Normalized email casing, extracted domains, matched contacts on exact email and shared domain. Dropped invalid addresses and records with no identifiable person.</p>
+      </div>
+      <div class="svc">
+        <div class="n">Score</div>
+        <p>Weighted scoring on fit, engagement, and recency. Tags carry the heaviest weight &mdash; they proved to be the only reliable signal, since company name was null on 58% of records.</p>
+      </div>
+      <div class="svc">
+        <div class="n">Segment</div>
+        <p>Every qualified contact sorted into exactly one of four sequences: no-show rebook, closed-lost, lead magnet re-engagement, long-term dormant. No contact appears twice.</p>
+      </div>
+      <div class="svc">
+        <div class="n">Reconcile</div>
+        <p>The step most reactivation work skips. Exported all 45 live campaigns, merged and deduplicated them, then cross-matched against every segment. Anyone already in an active campaign was pulled before launch.</p>
+      </div>
+      <div class="svc">
+        <div class="n">Suppress</div>
+        <p>Rebuilt the do-not-email list from bounces, unsubscribes, opt-outs, and everyone currently in a live campaign &mdash; from 615 records to 1,570.</p>
+      </div>
+      <div class="svc">
+        <div class="n">Attribute</div>
+        <p>Every reactivated contact tagged at sequence entry with sequence name and date, so source attribution lives in the CRM permanently instead of in my export.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" id="proof">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="snum">03</div>
+      <div class="stitle">
+        <div class="kicker">Results</div>
+        <h2>What the first run surfaced.</h2>
+      </div>
+    </div>
+
+    <div class="proof-grid reveal">
+      <div class="metric">
+        <div class="big">7</div>
+        <div class="cat">Collisions caught before send</div>
+        <div class="desc">The number that matters most. Each one was a prospect who would have received a cold reactivation email while already mid-sequence with another rep &mdash; the kind of error that costs a deal and never shows up in a dashboard.</div>
+        <div class="badges"><span class="badge">preventable</span><span class="badge">invisible before</span></div>
+      </div>
+      <div class="metric">
+        <div class="big">1,845</div>
+        <div class="cat">Qualified &amp; segmented</div>
+        <div class="desc">Contacts acquired and paid for years ago, then never worked. Reactivation costs nothing to acquire &mdash; the CAC is already sunk. The system&rsquo;s only job was making them visible again.</div>
+        <div class="badges"><span class="badge">sunk CAC</span><span class="badge">4 sequences</span></div>
+      </div>
+      <div class="metric">
+        <div class="big">248</div>
+        <div class="cat">Unsuppressed hard bounces</div>
+        <div class="desc">Dead addresses still receiving sends, quietly damaging domain reputation on every campaign. Removed from rotation and added to the suppression layer.</div>
+        <div class="badges"><span class="badge">deliverability</span></div>
+      </div>
+      <div class="metric">
+        <div class="big">1<span class="per"> day</span></div>
+        <div class="cat">To first clean send list</div>
+        <div class="desc">From raw exports to a ranked, deduplicated, collision-checked call list ready to load &mdash; built to re-run rather than to be done once.</div>
+        <div class="badges"><span class="badge">repeatable</span><span class="badge">idempotent</span></div>
+      </div>
+    </div>
+
+    <p class="note">Figures are from the first production run on a live client database. Contact counts rounded to the record. This case study is published with permission; the client is unnamed and no prospect data is included.</p>
+  </div>
+</section>
+
+<section class="lead-block">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="snum">04</div>
+      <div class="stitle">
+        <div class="kicker">Design decisions</div>
+        <h2>Why it&rsquo;s built this way.</h2>
+      </div>
+    </div>
+
+    <div class="value-grid reveal">
+      <div class="vcard">
+        <div class="vnum">01</div>
+        <h3>Tags over recency</h3>
+        <p>Every CRM defaults to sorting by date. In this dataset, date told you almost nothing and tags told you almost everything. The scoring model reflects the data, not the convention.</p>
+      </div>
+      <div class="vcard">
+        <div class="vnum">02</div>
+        <h3>Reconcile before send</h3>
+        <p>Most suppression is reactive &mdash; you find out you double-sent when someone complains. Pulling the live campaign list first makes the error preventable instead of forgivable.</p>
+      </div>
+      <div class="vcard">
+        <div class="vnum">03</div>
+        <h3>Small-business email isn&rsquo;t low-quality email</h3>
+        <p>An early version of the filter penalized shared inboxes and free domains. For small operators, <em>admissions@</em> is the owner and gmail is the business address. Scoring was corrected to stop burying the segment most likely to convert.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proves">
+  <div class="wrap">
+    <div class="proves-inner reveal">
+      <div class="kicker">What it proves</div>
+      <h3>Revenue systems fail when they can&rsquo;t remember state.</h3>
+      <p>My flagship outbound engine&rsquo;s hardest problem was idempotency &mdash; making sure a run never re-touched a prospect it had already reached. The first thing I found in this CRM was the same failure wearing different clothes: two tools with no shared memory, about to contact the same seven people twice.</p>
+      <p>That&rsquo;s the throughline in how I build. <em>The interesting part of a GTM system is rarely the sending. It&rsquo;s the state management underneath it</em> &mdash; knowing who you&rsquo;ve touched, what they did, and what that means for the next run. Get that wrong and every clever thing on top of it reads as spam.</p>
+      <p>This project also isn&rsquo;t a build for its own sake. The diagnosis came first: read the data, find where revenue was leaking, quantify it, then write only the code that fixed it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="built">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="snum">05</div>
+      <div class="stitle">
+        <div class="kicker">Stack &amp; next</div>
+        <h2>What it runs on, and where it goes.</h2>
+      </div>
+    </div>
+    <div class="svc-grid reveal">
+      <div class="svc"><div class="n">Python (pandas)</div><p>Extraction, identity matching, scoring, and segmentation.</p></div>
+      <div class="svc"><div class="n">GoHighLevel</div><p>Sequences, triggers, and entry tagging for durable attribution.</p></div>
+      <div class="svc"><div class="n">Instantly</div><p>Sending, plus campaign-level export for the reconciliation pass.</p></div>
+      <div class="svc"><div class="n">Make</div><p>Scheduled runs so scoring and suppression refresh without me.</p></div>
+      <div class="svc"><div class="n">Claude Code</div><p>Pipeline development and iteration.</p></div>
+      <div class="svc"><div class="n">Next</div><p>Weekly automated rebuild, an enrichment pass to fill the missing firmographic fields, and API-based campaign pull to replace manual export.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <div class="kicker">Let&rsquo;s talk</div>
+    <h2>Sitting on a database <em>nobody&rsquo;s working?</em></h2>
+    <p>Most teams don&rsquo;t need more leads. They need to see the ones they already paid for.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:junhaparkgtm@gmail.com">Email me</a>
+      <a class="btn btn-ghost" href="https://junhaparkgtm-prog.github.io/#work">See all work</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>Jonathan (Junha) Park &middot; GTM Engineer &middot; San Francisco, CA</div>
+    <div><a href="mailto:junhaparkgtm@gmail.com">junhaparkgtm@gmail.com</a> &nbsp;&middot;&nbsp; <a href="https://linkedin.com/in/jonathanpark00">LinkedIn</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(e){io.observe(e)});
+})();
+</script>
+</body>
+</html>

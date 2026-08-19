@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonathan Park · GTM Engineer</title>
+<meta name="description" content="GTM Engineer. Carried a $1.1M quota, then built the systems behind the number: AI outbound pipelines, account research automation, and speed-to-lead infrastructure.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1ED;
+    --surface:#FFFFFF;
+    --ink:#18211D;
+    --ink-soft:#566159;
+    --pine:#14483A;
+    --pine-deep:#0C2F26;
+    --pine-glow:#1E6F58;
+    --brass:#BE8B2D;
+    --brass-soft:#D9B05B;
+    --line:#D6DBD3;
+    --line-dark:#27473C;
+
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit;text-decoration:none}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+  .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(12,47,38,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line-dark);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .mark{font-family:var(--display);font-weight:700;color:var(--paper);font-size:1rem;letter-spacing:-.01em}
+  .mark span{color:var(--brass-soft)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#A9C2B7;transition:color .2s}
+  .navlinks a:hover{color:var(--brass-soft)}
+  .navlinks a:focus-visible{outline:2px solid var(--brass-soft);outline-offset:4px;border-radius:2px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--pine-deep);
+    color:var(--paper);
+    padding:84px 0 0;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(var(--line-dark) 1px,transparent 1px),linear-gradient(90deg,var(--line-dark) 1px,transparent 1px);
+    background-size:46px 46px;
+    opacity:.25;
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative}
+  .eyebrow{color:var(--brass-soft);margin-bottom:26px}
+  .hero h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(2.3rem,6vw,4.1rem);
+    line-height:1.04;
+    letter-spacing:-.025em;
+    max-width:15ch;
+  }
+  .hero h1 em{font-style:normal;color:var(--brass-soft)}
+  .hero .lede{
+    margin-top:26px;
+    font-size:clamp(1.02rem,1.6vw,1.18rem);
+    color:#C5D6CD;
+    max-width:54ch;
+  }
+  .hero-meta{
+    margin-top:30px;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;
+    color:#90ABA0;
+  }
+  .hero-meta .dot{color:var(--pine-glow)}
+
+  /* ---------- PIPELINE SIGNATURE ---------- */
+  .pipeline{
+    margin-top:58px;padding-bottom:64px;
+    position:relative;
+  }
+  .pipe-label{color:#7F9C90;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pipe-label::after{content:"";flex:1;height:1px;background:var(--line-dark)}
+  .pipe-track{
+    display:flex;align-items:stretch;gap:0;
+  }
+  .stage{
+    flex:1;min-width:0;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line-dark);
+    border-radius:10px;
+    padding:18px 16px 20px;
+    position:relative;
+    transition:border-color .3s,background .3s,transform .3s;
+  }
+  .stage:hover{border-color:var(--pine-glow);background:rgba(30,111,88,.10);transform:translateY(-3px)}
+  .stage .num{font-family:var(--mono);font-size:.7rem;color:var(--brass-soft);letter-spacing:.1em}
+  .stage .nm{font-family:var(--display);font-weight:600;font-size:1.02rem;margin-top:10px;color:var(--paper)}
+  .stage .tool{font-family:var(--mono);font-size:.7rem;color:#8FA99E;margin-top:6px;letter-spacing:.04em}
+  .connector{
+    flex:0 0 30px;align-self:center;position:relative;height:2px;background:var(--line-dark);
+    overflow:hidden;border-radius:2px;
+  }
+  .connector::after{
+    content:"";position:absolute;top:0;left:-40%;height:100%;width:40%;
+    background:linear-gradient(90deg,transparent,var(--pine-glow),var(--brass-soft),transparent);
+    animation:flow 2.6s linear infinite;
+  }
+  .connector:nth-of-type(4)::after{animation-delay:.5s}
+  .connector:nth-of-type(6)::after{animation-delay:1s}
+  .connector:nth-of-type(8)::after{animation-delay:1.5s}
+  @keyframes flow{from{left:-40%}to{left:120%}}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:80px 0}
+  .sec-head{margin-bottom:44px}
+  .sec-head .kicker{color:var(--pine);margin-bottom:14px}
+  .sec-head h2{
+    font-family:var(--display);font-weight:600;
+    font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.02em;line-height:1.1;
+  }
+
+  /* ---------- STATS ---------- */
+  .stats{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stats .wrap{padding-top:54px;padding-bottom:54px}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .stat{padding:6px 26px;border-left:1px solid var(--line)}
+  .stat:first-child{padding-left:0;border-left:none}
+  .stat .big{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,4vw,2.7rem);letter-spacing:-.03em;color:var(--pine);line-height:1}
+  .stat .lab{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px;line-height:1.4}
+
+  /* ---------- VALUE ---------- */
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:30px 26px}
+  .vcard .vnum{font-family:var(--mono);font-size:.72rem;color:var(--brass);letter-spacing:.1em}
+  .vcard h3{font-family:var(--display);font-weight:600;font-size:1.18rem;margin:14px 0 10px;letter-spacing:-.01em}
+  .vcard p{font-size:.95rem;color:var(--ink-soft)}
+
+  /* ---------- WORK ---------- */
+  .work{background:var(--surface);border-top:1px solid var(--line)}
+  .wcard{
+    border:1px solid var(--line);border-radius:12px;padding:32px 30px;margin-bottom:20px;
+    background:var(--paper);
+    transition:border-color .25s,box-shadow .25s;
+  }
+  .wcard:hover{border-color:var(--pine);box-shadow:0 8px 30px -16px rgba(20,72,58,.4)}
+  .wcard.flagship{background:var(--pine-deep);color:var(--paper);border-color:var(--pine-deep)}
+  .wcard.flagship .wmeta,.wcard.flagship p{color:#C5D6CD}
+  .wcard.flagship h3{color:var(--paper)}
+  .wtop{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .wcard h3{font-family:var(--display);font-weight:600;font-size:1.4rem;letter-spacing:-.02em}
+  .wmeta{font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;color:var(--ink-soft);margin:10px 0 16px}
+  .wcard p{font-size:.98rem;max-width:70ch}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;padding:5px 11px;border-radius:6px;border:1px solid var(--line);color:var(--ink-soft)}
+  .wcard.flagship .tag{border-color:var(--line-dark);color:#A9C2B7}
+  .wfoot{margin-top:22px;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;color:var(--brass)}
+  .wcard.flagship .wfoot{color:var(--brass-soft)}
+  .wfoot a{border-bottom:1px solid currentColor;padding-bottom:1px}
+  .sec-sub{color:var(--ink-soft);max-width:60ch;margin-top:12px;font-size:1.02rem}
+  .wgroup{display:flex;align-items:center;gap:14px;margin:44px 0 22px}
+  .wgroup:first-of-type{margin-top:0}
+  .wgroup .gname{font-family:var(--display);font-weight:600;font-size:1.06rem;letter-spacing:-.01em;color:var(--pine);white-space:nowrap}
+  .wgroup .gnote{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap}
+  .wgroup::after{content:"";flex:1;height:1px;background:var(--line)}
+  @media(max-width:620px){.wgroup{flex-wrap:wrap;gap:8px}.wgroup .gnote{width:100%}}
+
+  /* ---------- STACK ---------- */
+  .stack-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 40px}
+  .srow{display:grid;grid-template-columns:130px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line);align-items:start}
+  .srow .scat{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--pine);padding-top:3px}
+  .srow .stools{font-size:.95rem;color:var(--ink)}
+
+  /* ---------- EXPERIENCE ---------- */
+  .exp{background:var(--surface);border-top:1px solid var(--line)}
+  .erow{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:26px 0;border-top:1px solid var(--line)}
+  .erow:first-of-type{border-top:none}
+  .erow .when{font-family:var(--mono);font-size:.76rem;letter-spacing:.05em;color:var(--ink-soft);padding-top:4px}
+  .erow .role{font-family:var(--display);font-weight:600;font-size:1.1rem;letter-spacing:-.01em}
+  .erow .co{color:var(--pine);font-weight:600}
+  .erow .desc{font-size:.94rem;color:var(--ink-soft);margin-top:6px;max-width:66ch}
+
+  /* ---------- CONTACT ---------- */
+  .contact{background:var(--pine-deep);color:var(--paper);text-align:center;padding:96px 0}
+  .contact .kicker{color:var(--brass-soft);margin-bottom:20px}
+  .contact h2{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.025em;line-height:1.1;max-width:20ch;margin:0 auto}
+  .contact h2 em{font-style:normal;color:var(--brass-soft)}
+  .cta-row{margin-top:38px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:14px 26px;border-radius:8px;transition:transform .2s,background .2s,color .2s;
+  }
+  .btn-primary{background:var(--brass-soft);color:var(--pine-deep);font-weight:500}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--brass)}
+  .btn-ghost{border:1px solid var(--line-dark);color:var(--paper)}
+  .btn-ghost:hover{border-color:var(--brass-soft);color:var(--brass-soft)}
+  .btn:focus-visible{outline:2px solid var(--brass-soft);outline-offset:3px}
+  .foot{margin-top:48px;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;color:#6E8A7E}
+
+  /* ---------- REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:860px){
+    .stat-grid{grid-template-columns:repeat(2,1fr);gap:30px 0}
+    .stat{border-left:none;padding:0 0 0 0}
+    .stat:nth-child(odd){padding-right:20px}
+    .value-grid{grid-template-columns:1fr}
+    .stack-grid{grid-template-columns:1fr;gap:0}
+  }
+  @media(max-width:720px){
+    .navlinks{gap:18px}
+    .pipe-track{flex-direction:column}
+    .connector{flex:0 0 26px;width:2px;height:26px;align-self:center}
+    .connector::after{left:0;top:-40%;width:100%;height:40%;background:linear-gradient(180deg,transparent,var(--pine-glow),var(--brass-soft),transparent);animation:flowv 2.6s linear infinite}
+    @keyframes flowv{from{top:-40%}to{top:120%}}
+    .srow{grid-template-columns:1fr;gap:6px}
+    .erow{grid-template-columns:1fr;gap:6px}
+    .erow .when{padding-top:0}
+  }
+  @media(max-width:480px){
+    .wrap{padding:0 20px}
+    .navlinks a:not(.nav-cta){display:none}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="mark">Jonathan Park<span>.</span></a>
+    <div class="navlinks">
+      <a href="#work">Work</a>
+      <a href="#stack">Stack</a>
+      <a href="#experience">Experience</a>
+      <a href="cvp-engine.html">Flagship ↗</a>
+      <a href="mailto:junhaparkgtm@gmail.com" class="nav-cta">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow mono">GTM Engineer · Revenue Systems &amp; AI Automation</div>
+    <h1>From closing deals to <em>building the systems</em> that close them.</h1>
+    <p class="lede">I closed $1.1M+ on a quota, then got obsessed with the part most reps ignore, the manual grind. So I started automating it. Today I build AI outbound systems that research leads, write sequences, and follow up with no human in the loop.</p>
+    <div class="hero-meta mono">
+      <span>San Francisco, CA</span>
+      <span class="dot">/</span>
+      <span>Legal AI &amp; Education-Tech GTM</span>
+      <span class="dot">/</span>
+      <span>Open to GTM Engineer &amp; AE / Business Development roles</span>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-label mono"><a href="cvp-engine.html" style="color:inherit">CVP Engine · live pipeline ↗</a></div>
+      <div class="pipe-track">
+        <div class="stage"><div class="num">01</div><div class="nm">Source</div><div class="tool">Prospeo</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">02</div><div class="nm">Enrich</div><div class="tool">Prospeo · Claude</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">03</div><div class="nm">Filter</div><div class="tool">ICP match</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">04</div><div class="nm">Personalize</div><div class="tool">Video per lead</div></div>
+        <div class="connector"></div>
+        <div class="stage"><div class="num">05</div><div class="nm">Send</div><div class="tool">Instantly</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat-grid reveal">
+      <div class="stat"><div class="big">$1.1M+</div><div class="lab">B2B revenue closed on quota</div></div>
+      <div class="stat"><div class="big">30&ndash;40%</div><div class="lab">Close rate · top 2 of 5 AEs</div></div>
+      <div class="stat"><div class="big">Full-funnel</div><div class="lab">Sourcing → enrich → send, automated</div></div>
+      <div class="stat"><div class="big">$2.35M+</div><div class="lab">ARR pipeline · $189K closed won</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">What I do</div>
+      <h2>Not a seller who learned to code. Not an engineer who learned to sell.</h2>
+    </div>
+    <div class="value-grid">
+      <div class="vcard reveal">
+        <div class="vnum">A</div>
+        <h3>Build the pipeline</h3>
+        <p>Agentic outbound on Claude Code: sourcing, enrichment, personalization, and send running end-to-end with no human in the loop.</p>
+      </div>
+      <div class="vcard reveal">
+        <div class="vnum">B</div>
+        <h3>Automate the grind</h3>
+        <p>Account research, list-building, and follow-up turned into systems. One workflow cut ~2 hours of daily research and became the team-wide standard.</p>
+      </div>
+      <div class="vcard reveal">
+        <div class="vnum">C</div>
+        <h3>Lived the problem first</h3>
+        <p>I carried a $1.1M quota before I automated anything. I build for revenue teams because I know exactly where the process breaks. I was the one it broke on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="work" id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">Selected work</div>
+      <h2>Two halves of the revenue system.</h2>
+      <p class="sec-sub">Net-new pipeline on one side. The database you already paid for on the other. I build both.</p>
+    </div>
+
+    <div class="wgroup reveal">
+      <div class="gname">Outbound Systems</div>
+      <div class="gnote">net-new pipeline</div>
+    </div>
+
+        <div class="wcard flagship reveal">
+      <div class="wtop">
+        <h3>CVP Engine · Personalized Video Outbound</h3>
+      </div>
+      <div class="wmeta">End-to-end agentic pipeline · sourcing → send, hands-off</div>
+      <p>A Claude Code agent that runs the full outbound motion on its own: pulls and enriches leads, filters to ICP, renders a personalized video for each prospect, and ships campaign-ready sequences into Instantly. The pipeline runs without a human touching it.</p>
+      <div class="tags">
+        <span class="tag">Claude Code</span>
+        <span class="tag">Prospeo</span>
+        <span class="tag">Firecrawl</span>
+        <span class="tag">Modal</span>
+        <span class="tag">Bunny CDN</span>
+        <span class="tag">Instantly</span>
+      </div>
+      <div class="wfoot"><a href="cvp-engine.html">See the playbook →</a></div>
+    </div>
+
+    <div class="wcard reveal">
+      <div class="wtop"><h3>AI Account-Research Workflow</h3></div>
+      <div class="wmeta">Claude API (MCP) · adopted team-wide as the research standard</div>
+      <p>A Claude-powered research workflow that auto-generates decision-maker maps, tech-stack intel, and pitch angles on 20+ accounts at once, cutting roughly two hours of manual research per rep, per day.</p>
+      <div class="tags">
+        <span class="tag">Claude API</span>
+        <span class="tag">Model Context Protocol</span>
+        <span class="tag">Apollo</span>
+      </div>
+    </div>
+
+    <div class="wgroup reveal">
+      <div class="gname">CRM &amp; Lifecycle</div>
+      <div class="gnote">revenue you already paid for</div>
+    </div>
+
+    <div class="wcard reveal">
+      <div class="wtop"><h3>Reactivation Engine · CRM Diagnosis</h3></div>
+      <div class="wmeta">Python · pandas · 5,800-contact database · 45 live campaigns reconciled</div>
+      <p>Audited a live GTM stack running two systems that shared nothing, then built the scoring, segmentation, and suppression layer to fix it. Caught 7 prospects about to be double-contacted, found 248 unsuppressed hard bounces, and surfaced 1,845 already-paid-for contacts nobody was working.</p>
+      <div class="tags">
+        <span class="tag">Python (pandas)</span>
+        <span class="tag">GoHighLevel</span>
+        <span class="tag">Instantly</span>
+        <span class="tag">Make</span>
+      </div>
+      <div class="wfoot"><a href="reactivation-engine.html">See the case study →</a></div>
+    </div>
+
+    <div class="wcard reveal">
+      <div class="wtop"><h3>Speed-to-Lead System</h3></div>
+      <div class="wmeta">GoHighLevel automation · 10+ client accounts</div>
+      <p>Architected sub-5-minute speed-to-lead and follow-up sequences across 10+ accounts, lifting show rates from 20% to 70% by closing the gap between inbound interest and first human contact.</p>
+      <div class="tags">
+        <span class="tag">GoHighLevel</span>
+        <span class="tag">Make</span>
+        <span class="tag">Zapier</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">Technical stack</div>
+      <h2>The tools behind the systems.</h2>
+    </div>
+    <div class="reveal">
+      <div class="srow"><div class="scat">Development</div><div class="stools">Python (pandas) · SQL · Node.js · Bash · Git / GitHub</div></div>
+      <div class="srow"><div class="scat">AI</div><div class="stools">Claude Code · Claude API · Model Context Protocol (MCP) · Prompt Engineering</div></div>
+      <div class="srow"><div class="scat">Infrastructure</div><div class="stools">Supabase · Modal · Firecrawl · Prospeo · Instantly · Bunny CDN</div></div>
+      <div class="srow"><div class="scat">GTM</div><div class="stools">Clay · Zapier · Apollo.io · GoHighLevel</div></div>
+      <div class="srow"><div class="scat">Sales</div><div class="stools">Salesforce · Gong · ZoomInfo · LinkedIn Sales Navigator · 6sense · Tableau</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="exp" id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">Experience</div>
+      <h2>From carrying the number to building the machine.</h2>
+    </div>
+    <div class="reveal">
+      <div class="erow">
+        <div class="when">Apr 2026 to Present</div>
+        <div>
+          <div class="role">GTM Engineer (Contract) · <span class="co">Atomic Enrollment</span></div>
+          <div class="desc">Contract role held alongside Filevine. Closing B2B deals on the outbound offer while building the systems behind it: the autonomous outbound engine, the reactivation pipeline, and the account-research workflow now used team-wide.</div>
+        </div>
+      </div>
+      <div class="erow">
+        <div class="when">Oct 2025 to Aug 2026</div>
+        <div>
+          <div class="role">Enterprise Sales, Legal AI · <span class="co">Filevine</span></div>
+          <div class="desc">Series E · legal AI for law firms. Generated $2.35M+ ARR pipeline and $189K closed won across Q4 2025–Q2 2026; promoted SMB to Enterprise in 4 months. Multithreaded into 1,000+ attorney firms across personal injury, mass tort, and employment.</div>
+        </div>
+      </div>
+      <div class="erow">
+        <div class="when">Aug 2023 to Oct 2025</div>
+        <div>
+          <div class="role">Sales Enablement Lead · <span class="co">Atomic Enrollment</span></div>
+          <div class="desc">Built the agency's entire sales infrastructure from scratch: SOPs, scripts, objection frameworks, and onboarding, then productized a done-for-you placement service that became a core part of the offer.</div>
+        </div>
+      </div>
+      <div class="erow">
+        <div class="when">Jan 2022 to Aug 2023</div>
+        <div>
+          <div class="role">Account Executive · <span class="co">Atomic Enrollment</span></div>
+          <div class="desc">Closed $1.1M+ in 19 months at a 30–40% close rate, ranking top 2 of 5 AEs while running a consultative, audit-based sales process.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="kicker mono reveal">Let's talk</div>
+    <h2 class="reveal">Running a revenue team that should run on <em>systems?</em></h2>
+    <div class="cta-row reveal">
+      <a href="mailto:junhaparkgtm@gmail.com" class="btn btn-primary">junhaparkgtm@gmail.com</a>
+      <a href="https://linkedin.com/in/jonathanpark00" class="btn btn-ghost" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="foot mono reveal">Jonathan (Junha) Park · GTM Engineer · San Francisco, CA</div>
+  </div>
+</section>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
