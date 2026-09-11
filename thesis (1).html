@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTM Thesis · Jonathan Park</title>
+<meta name="description" content="How I think about go-to-market: twelve plays, one loop, and the same rules I run my life on. Specific knowledge, leverage, accountability.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1ED;
+    --surface:#FFFFFF;
+    --ink:#18211D;
+    --ink-soft:#566159;
+    --pine:#14483A;
+    --pine-deep:#0C2F26;
+    --pine-glow:#1E6F58;
+    --brass:#BE8B2D;
+    --brass-soft:#D9B05B;
+    --line:#D6DBD3;
+    --line-dark:#27473C;
+
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+
+  /* ---------- NAV ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(12,47,38,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-dark)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .mark{font-family:var(--display);font-weight:700;color:var(--paper);font-size:1rem;letter-spacing:-.01em}
+  .mark span{color:var(--brass-soft)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:#A9C2B7;transition:color .2s}
+  .navlinks a:hover{color:var(--brass-soft)}
+  .navlinks a.back{color:#7F9C90}
+  .navlinks a:focus-visible{outline:2px solid var(--brass-soft);outline-offset:4px;border-radius:2px}
+  @media(max-width:640px){.navlinks a:not(.back){display:none}}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--pine-deep);color:var(--paper);padding:70px 0 0;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-dark) 1px,transparent 1px),linear-gradient(90deg,var(--line-dark) 1px,transparent 1px);background-size:46px 46px;opacity:.25;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,#000 0%,transparent 75%);pointer-events:none}
+  .hero .wrap{position:relative}
+  .crumb{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:#7F9C90;margin-bottom:22px}
+  .crumb a{color:#A9C2B7;transition:color .2s}
+  .crumb a:hover{color:var(--brass-soft)}
+  .hero-eyebrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+  .flag-pill{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pine-deep);background:var(--brass-soft);padding:5px 12px;border-radius:20px}
+  .eyebrow{color:var(--brass-soft)}
+  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(2.3rem,6vw,4.1rem);line-height:1.04;letter-spacing:-.025em;max-width:14ch}
+  .hero h1 em{font-style:normal;color:var(--brass-soft)}
+  .hero .lede{margin-top:26px;font-size:clamp(1.02rem,1.6vw,1.18rem);color:#C5D6CD;max-width:58ch}
+  .hero .lede b{color:var(--paper);font-weight:600}
+
+  .role-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:1px solid var(--line-dark)}
+  .role-item{padding:20px 24px 4px 0;border-right:1px solid var(--line-dark)}
+  .role-item + .role-item{padding-left:24px}
+  .role-item:last-child{border-right:none;padding-right:0}
+  .role-item .rk{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-soft);margin-bottom:8px}
+  .role-item .rv{color:#C5D6CD;font-size:.92rem;line-height:1.5}
+
+  /* the loop: four stages, last feeds first */
+  .pipeline{margin-top:52px;padding-bottom:64px}
+  .pipe-label{color:#7F9C90;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pipe-label::after{content:"";flex:1;height:1px;background:var(--line-dark)}
+  .pipe-track{display:flex;align-items:stretch}
+  .stage{flex:1;min-width:0;background:rgba(255,255,255,.03);border:1px solid var(--line-dark);border-radius:10px;padding:18px 16px 20px;transition:border-color .3s,background .3s,transform .3s;display:block}
+  .stage:hover{border-color:var(--pine-glow);background:rgba(30,111,88,.10);transform:translateY(-3px)}
+  .stage:focus-visible{outline:2px solid var(--brass-soft);outline-offset:3px}
+  .stage .num{font-family:var(--mono);font-size:.7rem;color:var(--brass-soft);letter-spacing:.1em}
+  .stage .nm{font-family:var(--display);font-weight:600;font-size:1.06rem;margin-top:10px;color:var(--paper)}
+  .stage .tool{font-size:.8rem;color:#8FA99E;margin-top:6px;line-height:1.45}
+  .connector{flex:0 0 30px;align-self:center;position:relative;height:2px;background:var(--line-dark);overflow:hidden;border-radius:2px}
+  .connector::after{content:"";position:absolute;top:0;left:-40%;height:100%;width:40%;background:linear-gradient(90deg,transparent,var(--pine-glow),var(--brass-soft),transparent);animation:flow 2.6s linear infinite}
+  .connector:nth-of-type(4)::after{animation-delay:.6s}
+  .connector:nth-of-type(6)::after{animation-delay:1.2s}
+  @keyframes flow{from{left:-40%}to{left:120%}}
+  .loopback{margin-top:14px;height:22px;position:relative;margin-left:12%;margin-right:12%;border:1px dashed var(--line-dark);border-top:none;border-radius:0 0 12px 12px}
+  .loopback span{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:var(--pine-deep);padding:0 12px;font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-soft);white-space:nowrap}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:80px 0}
+  .sec-head{margin-bottom:44px}
+  .sec-head .kicker{color:var(--pine);margin-bottom:14px}
+  .sec-head h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.02em;line-height:1.1}
+  .sec-sub{color:var(--ink-soft);max-width:62ch;margin-top:12px;font-size:1.02rem}
+
+  /* ---------- PHILOSOPHY ---------- */
+  .philo{background:var(--surface);border-bottom:1px solid var(--line)}
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .vcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 26px}
+  .vcard .vnum{font-family:var(--mono);font-size:.72rem;color:var(--brass);letter-spacing:.1em}
+  .vcard h3{font-family:var(--display);font-weight:600;font-size:1.18rem;margin:14px 0 10px;letter-spacing:-.01em}
+  .vcard p{font-size:.95rem;color:var(--ink-soft)}
+
+  /* ---------- THE TWELVE ---------- */
+  .twelve-grid{display:grid;grid-template-columns:210px 1fr;gap:56px;align-items:start}
+  .rail{position:sticky;top:92px}
+  .rail .rg{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:18px 0 6px}
+  .rail .rg:first-child{margin-top:0}
+  .rail a{display:flex;gap:10px;padding:5px 0 5px 12px;font-size:.84rem;color:var(--ink-soft);border-left:2px solid var(--line);transition:color .2s,border-color .2s}
+  .rail a .rn{font-family:var(--mono);font-size:.7rem;color:#8A958D;padding-top:2px}
+  .rail a:hover{color:var(--pine)}
+  .rail a.on{color:var(--pine);border-left-color:var(--pine);font-weight:500}
+  .rail a.on .rn{color:var(--brass)}
+  .rail a:focus-visible{outline:2px solid var(--pine);outline-offset:2px}
+
+  .stage-head{display:flex;align-items:baseline;gap:14px;margin:64px 0 8px}
+  .stage-head:first-child{margin-top:0}
+  .stage-head .sname{font-family:var(--display);font-weight:600;font-size:1.06rem;letter-spacing:-.01em;color:var(--pine);white-space:nowrap}
+  .stage-head .snote{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .stage-head::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .play{padding:36px 0 40px;border-bottom:1px solid var(--line)}
+  .play:last-child{border-bottom:none}
+  .play .pnum{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--brass)}
+  .play h3{font-family:var(--display);font-weight:600;font-size:1.5rem;letter-spacing:-.02em;margin-top:6px}
+  .play .claim{font-family:var(--display);font-weight:500;font-size:clamp(1.15rem,2vw,1.35rem);line-height:1.3;letter-spacing:-.01em;color:var(--pine);margin:16px 0 14px;max-width:34ch}
+  .play p{font-size:.98rem;color:var(--ink-soft);max-width:66ch}
+  .play p + p{margin-top:12px}
+
+  .inpractice{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--pine);border-radius:0 10px 10px 0;padding:20px 22px}
+  .inpractice.next{border-left-color:var(--brass)}
+  .inpractice .ik{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--pine);margin-bottom:8px}
+  .inpractice.next .ik{color:var(--brass)}
+  .inpractice p{color:var(--ink);font-size:.95rem}
+  .inpractice a{color:var(--pine);border-bottom:1px solid currentColor;font-weight:500}
+
+  .sub{margin-top:26px;padding-top:22px;border-top:1px dashed var(--line)}
+  .sub .snum{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--brass)}
+  .sub h4{font-family:var(--display);font-weight:600;font-size:1.12rem;letter-spacing:-.01em;margin:4px 0 8px}
+
+  .tiers{margin-top:18px;display:grid;gap:8px;max-width:520px}
+  .tier{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.92rem}
+  .tier .tl{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--pine)}
+  .tier.t1{background:var(--pine-deep);border-color:var(--pine-deep);color:var(--paper)}
+  .tier.t1 .tl{color:var(--brass-soft)}
+  .tier.t2{margin-right:40px}
+  .tier.t3{margin-right:80px}
+
+  .sigs{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .sig{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px}
+  .sig .sn{font-family:var(--display);font-weight:600;font-size:1rem;letter-spacing:-.01em}
+  .sig .sw{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-top:2px}
+  .sig p{font-size:.9rem;margin-top:8px}
+
+  /* ---------- CLOSE THE LOOP ---------- */
+  .closer{background:var(--surface);border-top:1px solid var(--line)}
+  .closer .body{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+  .closer p{color:var(--ink-soft);font-size:1.02rem}
+  .closer p + p{margin-top:14px}
+  .closer .big{font-family:var(--display);font-weight:600;font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.2;letter-spacing:-.02em;color:var(--pine)}
+
+  /* ---------- CONTACT ---------- */
+  .contact{background:var(--pine-deep);color:var(--paper);text-align:center;padding:96px 0}
+  .contact .kicker{color:var(--brass-soft);margin-bottom:20px}
+  .contact h2{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.025em;line-height:1.1;max-width:20ch;margin:0 auto}
+  .contact h2 em{font-style:normal;color:var(--brass-soft)}
+  .cta-row{margin-top:38px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 26px;border-radius:8px;transition:transform .2s,background .2s,color .2s}
+  .btn-primary{background:var(--brass-soft);color:var(--pine-deep);font-weight:500}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--brass)}
+  .btn-ghost{border:1px solid var(--line-dark);color:var(--paper)}
+  .btn-ghost:hover{border-color:var(--brass-soft);color:var(--brass-soft)}
+  .btn:focus-visible{outline:2px solid var(--brass-soft);outline-offset:3px}
+  .foot{margin-top:48px;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;color:#6E8A7E}
+  .credit{margin-top:10px;font-size:.78rem;color:#6E8A7E}
+
+  /* ---------- REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:900px){
+    .twelve-grid{grid-template-columns:1fr;gap:0}
+    .rail{display:none}
+    .value-grid{grid-template-columns:1fr}
+    .closer .body{grid-template-columns:1fr;gap:20px}
+  }
+  @media(max-width:720px){
+    .role-strip{grid-template-columns:1fr}
+    .role-item,.role-item + .role-item{border-right:none;border-bottom:1px solid var(--line-dark);padding:16px 0}
+    .role-item:last-child{border-bottom:none}
+    .pipe-track{flex-direction:column}
+    .connector{flex:0 0 22px;width:2px;height:22px;align-self:center}
+    .connector::after{left:0;top:-40%;width:100%;height:40%;background:linear-gradient(180deg,transparent,var(--pine-glow),var(--brass-soft),transparent);animation:flowv 2.6s linear infinite}
+    @keyframes flowv{from{top:-40%}to{top:120%}}
+    .loopback{border:none;margin:18px 0 0;height:auto;text-align:center}
+    .loopback span{position:static;transform:none;padding:0}
+    .sigs{grid-template-columns:1fr}
+    .tier.t2,.tier.t3{margin-right:0}
+  }
+  @media(max-width:480px){.wrap{padding:0 20px}}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="https://junhaparkgtm-prog.github.io/" class="mark">Jonathan Park<span>.</span></a>
+    <div class="navlinks">
+      <a href="#philosophy">Philosophy</a>
+      <a href="#twelve">The twelve</a>
+      <a href="#loop">The loop</a>
+      <a href="https://junhaparkgtm-prog.github.io/" class="back">← Home</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="crumb"><a href="https://junhaparkgtm-prog.github.io/">Jonathan Park</a> &nbsp;/&nbsp; Thesis</div>
+    <div class="hero-eyebrow">
+      <span class="flag-pill">GTM thesis</span>
+      <span class="eyebrow mono">How I think · 2026</span>
+    </div>
+    <h1>GTM is a <em>leverage problem.</em></h1>
+    <p class="lede">Most revenue teams scale by adding reps. That's the expensive way. I think go-to-market works the way wealth does: you win with <b>specific knowledge about your buyer</b>, <b>leverage that doesn't need permission</b>, and judgment about where a human still matters. Below are the twelve plays I'd run at any company, and where I've already run them.</p>
+
+    <div class="role-strip">
+      <div class="role-item"><div class="rk">The belief</div><div class="rv">One operator with the right system should out-produce a team.</div></div>
+      <div class="role-item"><div class="rk">The rule</div><div class="rv">Automate the research. Keep a human on the judgment.</div></div>
+      <div class="role-item"><div class="rk">The scoreboard</div><div class="rv">Qualified decision makers moved closer to a calendar, every day.</div></div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-label mono">The system · four stages, one loop</div>
+      <div class="pipe-track">
+        <a class="stage" href="#define"><div class="num">01 to 03</div><div class="nm">Define</div><div class="tool">ICP, scoring, signals</div></a>
+        <div class="connector"></div>
+        <a class="stage" href="#reach"><div class="num">04 to 06</div><div class="nm">Reach</div><div class="tool">Lists, automated outbound, copilots</div></a>
+        <div class="connector"></div>
+        <a class="stage" href="#convert"><div class="num">07 to 09</div><div class="nm">Convert</div><div class="tool">Inbound, meetings, proposals</div></a>
+        <div class="connector"></div>
+        <a class="stage" href="#compound"><div class="num">10 to 12</div><div class="nm">Compound</div><div class="tool">ABM assets, events, CRM hygiene</div></a>
+      </div>
+      <div class="loopback" aria-hidden="true"><span>12 feeds back into 01</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="philo" id="philosophy">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">Why this is personal</div>
+      <h2>The same rules I run my life on.</h2>
+      <p class="sec-sub">I didn't come to GTM through a framework. I came through carrying a quota and realizing the reps who win aren't working harder. They've built leverage the rest of the floor doesn't have.</p>
+    </div>
+    <div class="value-grid">
+      <div class="vcard reveal">
+        <div class="vnum">A</div>
+        <h3>Specific knowledge</h3>
+        <p>Tools are commodities. Knowing that a CDL school owner was a driver first, decides on one call, and tunes out agency jargon is not. That's the edge no vendor can sell you.</p>
+      </div>
+      <div class="vcard reveal">
+        <div class="vnum">B</div>
+        <h3>Permissionless leverage</h3>
+        <p>Code and media scale without anyone's sign-off. A personalized video rendered for 50 prospects a day is both at once. Headcount is the leverage you have to ask for.</p>
+      </div>
+      <div class="vcard reveal">
+        <div class="vnum">C</div>
+        <h3>Accountability</h3>
+        <p>Every system I build answers to one number. If it doesn't move qualified buyers closer to a calendar, it's a hobby, not GTM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="twelve">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">The twelve</div>
+      <h2>What I believe, and where I've run it.</h2>
+      <p class="sec-sub">Each play has the belief, the reasoning, and the proof. Where I haven't run something yet, I say so and show how I'd apply it.</p>
+    </div>
+
+    <div class="twelve-grid">
+      <aside class="rail" aria-label="Thesis index">
+        <div class="rg">Define</div>
+        <a href="#p1"><span class="rn">01</span>ICP definition</a>
+        <a href="#p2"><span class="rn">02</span>Account scoring</a>
+        <a href="#p3"><span class="rn">03</span>Signals</a>
+        <div class="rg">Reach</div>
+        <a href="#p4"><span class="rn">04</span>List building</a>
+        <a href="#p5"><span class="rn">05</span>Automated outbound</a>
+        <a href="#p6"><span class="rn">06</span>Man in the loop</a>
+        <div class="rg">Convert</div>
+        <a href="#p7"><span class="rn">07</span>Inbound + routing</a>
+        <a href="#p8"><span class="rn">08</span>Meeting automation</a>
+        <a href="#p9"><span class="rn">09</span>Proposal drafting</a>
+        <div class="rg">Compound</div>
+        <a href="#p10"><span class="rn">10</span>ABM assets</a>
+        <a href="#p11"><span class="rn">11</span>Event plays</a>
+        <a href="#p12"><span class="rn">12</span>CRM hygiene</a>
+      </aside>
+
+      <div class="plays">
+
+        <!-- DEFINE -->
+        <div class="stage-head" id="define"><div class="sname">Define</div><div class="snote">who to go after</div></div>
+
+        <article class="play reveal" id="p1">
+          <div class="pnum">01</div>
+          <h3>ICP definition</h3>
+          <div class="claim">Your ICP is who stays and pays, not who replies.</div>
+          <p>Most companies have a rough sense of who buys and nothing data-driven behind it. Reply rate is the trap: the segment that answers fastest is often the one that churns fastest. The better question is retroactive. Which customers closed, stayed longest, and grew?</p>
+          <p>With enough closed-won history in the CRM, run that analysis on deals that have lived their full lifecycle. Without it, test two or three candidate ICPs in parallel through outbound and let the market tell you which one feels the problem.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>At Atomic Enrollment the answer got specific: owners of CDL, HVAC, welding, and cosmetology schools, often former tradespeople, who make fast decisions and buy filled seats, not marketing. That one definition shaped everything downstream, from list sources to the words in every video.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p2">
+          <div class="pnum">02</div>
+          <h3>Account scoring</h3>
+          <div class="claim">Two scores, not one. Fit decides if you track an account. Signals decide if you call it today.</div>
+          <p>Firmographic fit (industry, size, location) barely moves, so it sets the tier. Signals decay fast, so they set the priority. For the model itself I prefer the middle path: a deterministic equation the agent runs, with the agent writing out its reasoning so a rep can see why an account scored a 7 and argue with it. A black-box score nobody trusts is a score nobody uses.</p>
+          <div class="tiers" aria-label="Account tiers">
+            <div class="tier t1"><span class="tl">Tier 1</span><span>Several touchpoints across several channels</span></div>
+            <div class="tier t2"><span class="tl">Tier 2</span><span>A call plus a rep-written email</span></div>
+            <div class="tier t3"><span class="tl">Tier 3</span><span>Automated outbound sequence</span></div>
+          </div>
+          <div class="sub">
+            <div class="snum">02b</div>
+            <h4>Calibrating the score</h4>
+            <p>Before trusting any score, hand-pick 10 to 20 accounts that are perfect fits and 10 to 20 you'd never sell to. Run the model against both. Every perfect fit that scores low, and every bad fit that scores high, is a rule you haven't written yet.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p3">
+          <div class="pnum">03</div>
+          <h3>Signals</h3>
+          <div class="claim">Be precise about which signals you track and exactly what each one is worth.</div>
+          <p>"Signals" got sold as a black box: somebody at this company might be interested in something like your product. The value isn't in having signals. It's in the weighting. A visit to your pricing page beats a funding announcement every time, because it's further down the funnel. And the best signals are the ones built for your market that nobody else is watching.</p>
+          <div class="sub">
+            <div class="snum">03b</div>
+            <h4>Signals I'd weight for trade schools</h4>
+            <div class="sigs">
+              <div class="sig"><div class="sn">Active ad spend</div><div class="sw">Already in my enrichment</div><p>A school running paid ads is already paying for leads. If there's no instant follow-up on the site, that money is leaking, and it's visible from outside.</p></div>
+              <div class="sig"><div class="sn">Admissions hiring</div><div class="sw">Custom signal</div><p>A job post for an admissions rep or enrollment coordinator is a school announcing that follow-up is breaking. The description tells you how.</p></div>
+              <div class="sig"><div class="sn">Video rewatches</div><div class="sw">Highest intent in the motion</div><p>A prospect rewatching the video made for their school is the hottest signal I have. The play is a call within minutes, not days.</p></div>
+              <div class="sig"><div class="sn">Champion moves</div><div class="sw">Warmest outbound there is</div><p>Every owner and director who's had a good result with us, tracked for role changes. Happy at the last school means a warm call at the next one.</p></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- REACH -->
+        <div class="stage-head" id="reach"><div class="sname">Reach</div><div class="snote">getting in front of them</div></div>
+
+        <article class="play reveal" id="p4">
+          <div class="pnum">04</div>
+          <h3>List building</h3>
+          <div class="claim">Build the list where your buyer actually lives.</div>
+          <p>If they live on LinkedIn, scrape LinkedIn. Local businesses start from maps data, then waterfall enrichment to find the owner. Ecom has its own databases. The underrated category is regulated industries, where the government already maintains the list for you. When none of those fit, raw web search plus a scraper Claude writes beats buying a stale vendor list.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>Trade school owners mostly don't live on LinkedIn, and they're a public-record industry: CDL schools register with the FMCSA Training Provider Registry, cosmetology schools with state boards. My engine sources in Prospeo, qualifies each school's site against the ICP with Firecrawl, and only then spends enrichment credits. Qualify before you pay.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p5">
+          <div class="pnum">05</div>
+          <h3>Fully automated outbound</h3>
+          <div class="claim">Automate the research and the asset. Keep the copy on a template.</div>
+          <p>Full automation works when ACVs are lower and the prospect pool is big. Two rules I don't bend. Deliverability comes first: real, warmed Google and Microsoft inboxes, nothing shared with strangers who can burn the server. And copy isn't written agentically. A template with variables is the only way to know which message is actually working.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>CVP Engine: a Claude Code agent wiring Prospeo, Firecrawl, Claude, Modal, Bunny CDN, and Instantly. It sources decision makers, researches each school's site and ads, renders a personalized video, and ships the sequence. 25 to 50 videos a day on about 30 minutes of my time, and replies feed the next run. <a href="cvp-engine.html">See the build</a></p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p6">
+          <div class="pnum">06</div>
+          <h3>Man in the loop</h3>
+          <div class="claim">When the deal is big enough, the agent drafts and the human sends.</div>
+          <p>Same sourcing, same enrichment, same research as full automation. The difference is the last mile: a rep edits every message before it goes. Higher ACVs and tier 1 accounts deserve a person's judgment on the words, and the system's job is to make that person faster, not replace them.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>Enterprise at Filevine meant multithreading into 1,000+ attorney firms, where one wrong line burns the account. At Atomic, every contact I dial loads into the CRM with a brief already built: business model, how they enroll today, where the funnel breaks, an opening line, and three pain points specific to their niche. I never walk into a call cold.</p>
+          </div>
+        </article>
+
+        <!-- CONVERT -->
+        <div class="stage-head" id="convert"><div class="sname">Convert</div><div class="snote">when they raise a hand</div></div>
+
+        <article class="play reveal" id="p7">
+          <div class="pnum">07</div>
+          <h3>Inbound forms + routing</h3>
+          <div class="claim">Every field you ask for costs you conversions. Let enrichment fill in the rest.</div>
+          <p>With waterfall enrichment near full coverage, a form can be name and work email. The gap between 70% and near-100% coverage is the gap between knowing who your leads are and guessing. Route inside the CRM, and route after enrichment, not before, or you're routing on half the picture.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>In enrollment, speed decides it. Students shop three to five schools and usually go with whoever follows up first. Atomic's offer is built around that: Ivy, an AI sales rep, works a school's inquiries the moment they land, and I built the speed-to-lead infrastructure on our own side.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p8">
+          <div class="pnum">08</div>
+          <h3>Meeting automation</h3>
+          <div class="claim">No rep should walk into a call cold, or leave one without the CRM updated.</div>
+          <p>Before the call: past recordings plus enrichment become a prep brief. After the call: an agent connected to the CRM updates the record and drafts the follow-up. A good Claude skill covers most of it. Hosting it so it fires automatically before every meeting is the upgrade.</p>
+          <div class="inpractice next">
+            <div class="ik">Built, and what I'm wiring next</div>
+            <p>The before half is how I already dial. The after half is next: call recorder transcript into the CRM record, with the follow-up drafted from what the prospect actually said, not what I remember an hour later.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p9">
+          <div class="pnum">09</div>
+          <h3>Proposal drafting</h3>
+          <div class="claim">Write the proposal from the call, not from the template.</div>
+          <p>Past proposals plus house rules become a skill on every rep's Claude. The discovery transcript goes in, a draft doc comes out. The rep's job shifts from writing to judging, which is where their time should go anyway.</p>
+          <div class="inpractice">
+            <div class="ik">A rule I learned closing</div>
+            <p>Pricing follows the debrief, not the script. What the buyer said on the call should shape the offer, and a proposal skill should be built to enforce that, not paper over it.</p>
+          </div>
+        </article>
+
+        <!-- COMPOUND -->
+        <div class="stage-head" id="compound"><div class="sname">Compound</div><div class="snote">every touch worth more next time</div></div>
+
+        <article class="play reveal" id="p10">
+          <div class="pnum">10</div>
+          <h3>ABM asset generation</h3>
+          <div class="claim">The strongest outbound message is an asset only that account could receive.</div>
+          <p>For tier 1, build something for one company: a video, a one-pager, a landing page, a teardown of their funnel. The best setup is a skill that reads your sales materials and company context, so every asset sounds like you instead of like a template.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>This is the whole CVP motion: a custom video for every school, built from its own website. The play predates the automation. Run by hand, it drove $1.87M in revenue and 97 enrollments for one heavy equipment training school. I automated it. On the collateral side I render one-pagers, decks, and closer SOPs in HTML on the brand system.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p11">
+          <div class="pnum">11</div>
+          <h3>Event plays</h3>
+          <div class="claim">Events are the rare moment your buyer tells you where they'll be.</div>
+          <p>Virtual events: follow up on the topic of the event, not your product. In person: scrape every post mentioning the event, have Claude keep only the ones that confirm attending, qualify the people who posted, then send one line. Want to meet up there?</p>
+          <div class="inpractice next">
+            <div class="ik">How I'd apply it</div>
+            <p>School owners gather at industry conferences and accreditation events, but most of them aren't posting about it. So the list comes from exhibitor and speaker pages instead of social posts. Same play, different source.</p>
+          </div>
+        </article>
+
+        <article class="play reveal" id="p12">
+          <div class="pnum">12</div>
+          <h3>CRM hygiene + enrichment</h3>
+          <div class="claim">Your CRM is the cheapest pipeline you'll ever have, if you can trust it.</div>
+          <p>Years of stale titles, bounced emails, and empty fields make every other play on this page worse. A one-time cleanup goes stale within a year, so enrichment has to run continuously. Start with the segment you care least about, prove the process, then work up to what matters most.</p>
+          <div class="inpractice">
+            <div class="ik">Where I've run it</div>
+            <p>At Atomic I rebuilt an 8,000+ contact master list into the CRM with clean fields and notes, then built the Reactivation Engine on top: five sequences covering no-shows, closed-lost, and long-dormant leads. The database you already paid for is net-new pipeline if you work it. <a href="reactivation-engine.html">See the build</a></p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closer" id="loop">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker mono">The loop</div>
+      <h2>Twelve feeds one.</h2>
+    </div>
+    <div class="body reveal">
+      <div class="big">A clean CRM is what makes the retroactive ICP analysis possible. The system closes on itself, and every lap it knows the buyer a little better.</div>
+      <div>
+        <p>That's the part I care about most. Not any single play, but the compounding. Each list is sharper than the last, each score better calibrated, each message closer to what the buyer actually said.</p>
+        <p>It's the same way I think about a career. Build specific knowledge nobody can hand you, point leverage at it, and let it compound. GTM is just where I get to do that every day, with a number attached.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="kicker mono reveal">Let's talk</div>
+    <h2 class="reveal">Running a revenue team that should run on <em>systems?</em></h2>
+    <div class="cta-row reveal">
+      <a href="mailto:junhaparkgtm@gmail.com" class="btn btn-primary">junhaparkgtm@gmail.com</a>
+      <a href="https://linkedin.com/in/jonathanpark00" class="btn btn-ghost" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="foot mono reveal">Jonathan (Junha) Park · GTM Engineer · San Francisco, CA</div>
+    <div class="credit reveal">The twelve-play structure is adapted from The Kiln's GTM playbook. The takes and the builds are mine.</div>
+  </div>
+</section>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // highlight the current play in the side rail
+  const links = [...document.querySelectorAll('.rail a')];
+  const byId = Object.fromEntries(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  const spy = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(a=>a.classList.remove('on'));
+        byId[e.target.id] && byId[e.target.id].classList.add('on');
+      }
+    });
+  },{rootMargin:'-35% 0px -60% 0px'});
+  document.querySelectorAll('.play').forEach(p=>spy.observe(p));
+</script>
+
+</body>
+</html>
